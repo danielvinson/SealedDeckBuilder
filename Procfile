@@ -1,1 +1,1 @@
-web: python SealedDeckBuilder/app.py
+web: gunicorn app:app
