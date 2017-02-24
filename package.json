@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "gunicorn": "gunicorn --pythonpath backend app:app",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
+    "build": "webpack -p",
     "start": "python /backend/app.py"
   },
   "author": "",

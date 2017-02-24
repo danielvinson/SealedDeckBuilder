@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath backend app:app
+web: npm run build && npm run gunicorn
