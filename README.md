@@ -47,6 +47,7 @@ sudo webpack
 ```
 
 
-To run the dev server: `sudo heroku local web`
+To run the dev server: `sudo heroku local -e .env.local dev`
+(To test a production build, run `sudo heroku local -e .env web`)
 
 Then `open localhost:5000`
