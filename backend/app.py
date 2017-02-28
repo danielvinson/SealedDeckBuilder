@@ -1,11 +1,13 @@
 import os
-
+import psycopg2
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
+
+from models import Pool, Build
 
 # Route front-end
 
@@ -14,9 +16,14 @@ def home():
     return render_template('home.html')
 
 
-# API
+@app.route('/admin/')
+def admin():
+    # Page for debugging/dev
+    builds = Build.query.all()
+    pools = Pool.query.all()
+    return render_template('admin.html', pools=pools, builds=builds)
 
-from models import Pool, Build
+# API
 
 @app.route('/build/', methods=['POST'])
 def add_build():
@@ -28,7 +35,11 @@ def get_build(build_id):
 
 @app.route('/pool/', methods=['POST'])
 def add_pool():
-    return True
+    cards = request.get_json().get('cards')
+    pool = Pool(json.dumps(cards))
+    db.session.add(pool)
+    db.session.commit()
+    return pool 
 
 @app.route('/pool/<string:pool_id>', methods=['GET'])
 def get_pool(pool_id):
