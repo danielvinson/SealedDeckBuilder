@@ -13,7 +13,20 @@ pip install -r requirements.txt
 npm install
 ```
 
-Example setup on my Ubuntu AWS instance:
+## Environment Setup
+
+### Mac OS X:
+
+Install `brew` if you don't already have it. (Should exist on most installations)
+
+`brew install python`
+`brew install npm`
+`brew install yarn`
+`brew install heroku`
+`yarn`
+`yarn start`
+
+### Ubuntu AWS instance:
 
 sudo apt-get install python-pip python-dev build-essential
 
@@ -30,7 +43,6 @@ sudo apt-get update
 
 sudo apt-get install heroku
 ```
-
 
 ( Add my keys to GitHub )
 
