@@ -27,11 +27,18 @@ def admin():
 
 @app.route('/build/', methods=['POST'])
 def add_build():
-    return True
+    pool_id = request.get_json().get('pool')
+    cards = request.get_json().get('cards')
+    pool = Pool.query.filter_by(id=pool_id).first()
+    build = Build(cards, pool)
+    db.session.add(build)
+    db.session.commit()
+    return build
 
 @app.route('/build/<string:build_id>', methods=['GET'])
 def get_build(build_id):
-    return "Build"
+    build = Build.query.filter_by(id=build_id).first()
+    return build
 
 @app.route('/pool/', methods=['POST'])
 def add_pool():
@@ -43,7 +50,8 @@ def add_pool():
 
 @app.route('/pool/<string:pool_id>', methods=['GET'])
 def get_pool(pool_id):
-    return "Pool ID: %s" % (pool_id)
+    pool = Pool.query.filter_by(id=pool_id).first()
+    return pool
 
 #####
 
