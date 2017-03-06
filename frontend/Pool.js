@@ -73,7 +73,11 @@ export default class Pool extends Component {
 
   onSave = () => {
     this.setState({ error: null })
-    axios.post('/pool/', { cards: this.state.cards })
+    let multiverse_ids = [];
+    for (let card in this.state.cards){
+      multiverse_ids.push(this.state.cards[card].multiverseid)
+    }
+    axios.post('/pool/', { cards: multiverse_ids })
       .then((response) => {
         this.setState({ id: response.data.id })
       })
@@ -99,6 +103,7 @@ export default class Pool extends Component {
           )}
         </div>
       </div>
-    )
+    ) 
   }
 }
+

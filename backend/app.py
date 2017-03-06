@@ -2,6 +2,7 @@ import os
 import psycopg2
 import json
 from flask import Flask, render_template, request
+from flask.json import jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -34,12 +35,12 @@ def add_build():
     build = Build(cards, pool)
     db.session.add(build)
     db.session.commit()
-    return build
+    return 'Build Added %s' % (build)
 
 @app.route('/build/<string:build_id>', methods=['GET'])
 def get_build(build_id):
     build = Build.query.filter_by(id=build_id).first()
-    return build
+    return jsonify(cards=build.cards)
 
 @app.route('/pool/', methods=['POST'])
 def add_pool():
@@ -47,12 +48,12 @@ def add_pool():
     pool = Pool(json.dumps(cards))
     db.session.add(pool)
     db.session.commit()
-    return pool
+    return 'Pool Added %s' % (pool)
 
 @app.route('/pool/<string:pool_id>', methods=['GET'])
 def get_pool(pool_id):
     pool = Pool.query.filter_by(id=pool_id).first()
-    return pool
+    return jsonify(cards=pool.cards)
 
 #####
 
