@@ -81,13 +81,14 @@ export default class Pool extends Component {
   }
 
   render() {
-    const { loading, id, cards } = this.state
+    const { loading, id, cards, error } = this.state
     if (loading) {
       return <div className="pool--loading">Loading...</div>
     }
     const sortedCards = sortBy(cards, [(c) => RARITY_RANK[c.rarity], (c) => getColorRank(c.colors, c.type)])
     return (
       <div className="pool">
+        {error && <div className="alert alert-danger" role="alert">{error}</div>}
         {id && <h2>Pool #{id}</h2>}
         <button className="btn btn-lg btn-primary pool__button" onClick={this.onSave}>
           Save Pool
