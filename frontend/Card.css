@@ -1,0 +1,13 @@
+.card {
+  overflow: visible;
+  max-height: 37px;
+  background: transparent;
+}
+
+.card:hover {
+  z-index: 100;
+}
+
+.card__image {
+  border-radius: 8px;
+}

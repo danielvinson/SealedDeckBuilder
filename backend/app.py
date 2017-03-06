@@ -1,5 +1,6 @@
 import os
 import psycopg2
+import json
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 
@@ -46,7 +47,7 @@ def add_pool():
     pool = Pool(json.dumps(cards))
     db.session.add(pool)
     db.session.commit()
-    return pool 
+    return pool
 
 @app.route('/pool/<string:pool_id>', methods=['GET'])
 def get_pool(pool_id):

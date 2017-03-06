@@ -1,0 +1,11 @@
+.pool__cards {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  max-height: 700px;
+  margin-bottom: 300px;
+}
+
+.pool__button {
+  margin: 10px 0;
+}

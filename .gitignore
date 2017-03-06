@@ -1,5 +1,6 @@
 .DS_Store
 venv
 node_modules
+npm-debug.log
 static/bundle.js
 *.py[cod]
