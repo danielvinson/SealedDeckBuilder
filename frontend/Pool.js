@@ -43,39 +43,60 @@ function getColorRank(colors, type) {
 
 export default class Pool extends Component {
   static propTypes = {
+    id: PropTypes.string,
     set: PropTypes.string.isRequired,
   }
 
   constructor(props) {
     super(props)
     this.state = {
+      id: this.props.id,
       cards: [],
       loading: true,
+      error: null,
     }
   }
 
   componentDidMount() {
-    this.setState({ loading: true })
+    this.setState({ loading: true, error: null })
     const boosterPromises = []
     for (var i = 0; i < 6; i++) {
       boosterPromises.push(axios.get(`https://api.magicthegathering.io/v1/sets/${this.props.set}/booster`))
     }
-    Promise.all(boosterPromises).then((responses) => {
-      const cards = responses.reduce((cardArr, response) => cardArr.concat(response.data.cards), [])
-      this.setState({ cards, loading: false })
-    }).catch((response) => this.setState({ loading: false }))
+    Promise.all(boosterPromises)
+      .then((responses) => {
+        const cards = responses.reduce((cardArr, response) => cardArr.concat(response.data.cards), [])
+        this.setState({ cards, loading: false })
+      })
+      .catch((response) => this.setState({ loading: false, error: 'Failed to generate pool.' }))
+  }
+
+  onSave = () => {
+    this.setState({ error: null })
+    axios.post('/pool/', { cards: this.state.cards })
+      .then((response) => {
+        this.setState({ id: response.data.id })
+      })
+      .catch((response) => this.setState({ error: 'Failed to save.' }))
   }
 
   render() {
-    if (this.state.loading) {
-      return <div>Loading...</div>
+    const { loading, id, cards } = this.state
+    if (loading) {
+      return <div className="pool--loading">Loading...</div>
     }
-    const sortedCards = sortBy(this.state.cards, [(c) => RARITY_RANK[c.rarity], (c) => getColorRank(c.colors, c.type)])
+    const sortedCards = sortBy(cards, [(c) => RARITY_RANK[c.rarity], (c) => getColorRank(c.colors, c.type)])
     return (
       <div className="pool">
-        {sortedCards.map((card, i) =>
-          <Card card={card} key={i} />
-        )}
+        {id && <h2>Pool #{id}</h2>}
+        <button className="btn btn-lg btn-primary pool__button" onClick={this.onSave}>
+          Save Pool
+        </button>
+        <div className="pool__cards">
+          {sortedCards.map((card, i) =>
+            <Card card={card} key={i} />
+          )}
+        </div>
       </div>
     )
   }
