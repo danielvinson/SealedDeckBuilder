@@ -48,7 +48,7 @@ def add_pool():
     pool = Pool(json.dumps(cards))
     db.session.add(pool)
     db.session.commit()
-    return 'Pool Added %s' % (pool)
+    return jsonify(pool='%s' % pool.id)
 
 @app.route('/pool/<string:pool_id>', methods=['GET'])
 def get_pool(pool_id):
