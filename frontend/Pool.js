@@ -1,6 +1,9 @@
 import React, { PropTypes, Component } from 'react'
 import axios from 'axios'
 import sortBy from 'lodash.sortby'
+import uniq from 'lodash.uniq'
+import find from 'lodash.find'
+import invariant from 'invariant'
 
 import Card from './Card'
 
@@ -44,7 +47,7 @@ function getColorRank(colors, type) {
 export default class Pool extends Component {
   static propTypes = {
     id: PropTypes.string,
-    set: PropTypes.string.isRequired,
+    boosters: PropTypes.array.isRequired,
   }
 
   constructor(props) {
@@ -58,11 +61,22 @@ export default class Pool extends Component {
   }
 
   componentDidMount() {
+    const { id, boosters } = this.props
+    invariant(
+      boosters.length >= 1,
+      'Must provide at least one set'
+    )
     this.setState({ loading: true, error: null })
-    const boosterPromises = []
-    for (var i = 0; i < 6; i++) {
-      boosterPromises.push(axios.get(`https://api.magicthegathering.io/v1/sets/${this.props.set}/booster`))
+    if (id) {
+      this.loadPool()
+    } else {
+      this.generatePool()
     }
+  }
+
+  generatePool() {
+    const boosterPromises =
+      this.props.boosters.map(set => axios.get(`https://api.magicthegathering.io/v1/sets/${set}/booster`))
     Promise.all(boosterPromises)
       .then((responses) => {
         const cards = responses.reduce((cardArr, response) => cardArr.concat(response.data.cards), [])
@@ -71,15 +85,28 @@ export default class Pool extends Component {
       .catch((response) => this.setState({ loading: false, error: 'Failed to generate pool.' }))
   }
 
+  loadPool() {
+    axios.get(`/pool/${this.props.id}`)
+      .then((response) => {
+        const cardIds = JSON.parse(response.data.cards)
+        const setPromises = uniq(this.props.boosters).map(set => axios.get(`/sets/${set.toUpperCase()}`))
+        Promise.all(setPromises)
+          .then((responses) => {
+            const cardInfo = responses.reduce((cardArr, response) => cardArr.concat(response.data.cards), [])
+            const cards = cardIds.map(id => find(cardInfo, ['multiverseid', id]))
+            this.setState({ cards, loading: false })
+          })
+          .catch((response) => this.setState({ loading: false, error: 'Failed to load card information.' }))
+      })
+      .catch((response) => this.setState({ loading: false, error: 'Failed to load pool.' }))
+  }
+
   onSave = () => {
     this.setState({ error: null })
-    let multiverse_ids = [];
-    for (let card in this.state.cards){
-      multiverse_ids.push(this.state.cards[card].multiverseid)
-    }
-    axios.post('/pool/', { cards: multiverse_ids })
+    const cards = this.state.cards.map(card => card.multiverseid)
+    axios.post('/pool/', { cards })
       .then((response) => {
-        this.setState({ id: response.data.id })
+        this.setState({ id: response.data.pool })
       })
       .catch((response) => this.setState({ error: 'Failed to save.' }))
   }
@@ -94,16 +121,16 @@ export default class Pool extends Component {
       <div className="pool">
         {error && <div className="alert alert-danger" role="alert">{error}</div>}
         {id && <h2>Pool #{id}</h2>}
-        <button className="btn btn-lg btn-primary pool__button" onClick={this.onSave}>
+        {!id && <button className="btn btn-lg btn-primary pool__button" onClick={this.onSave}>
           Save Pool
-        </button>
+        </button>}
         <div className="pool__cards">
           {sortedCards.map((card, i) =>
             <Card card={card} key={i} />
           )}
         </div>
       </div>
-    ) 
+    )
   }
 }
 
