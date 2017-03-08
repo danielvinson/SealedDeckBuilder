@@ -1,9 +1,32 @@
-import React from 'react';
+import React, { Component } from 'react';
+import qs from 'qs'
 import Pool from './Pool'
 
 import './SealedDeckBuilder.css'
 
-var SealedDeckBuilder = React.createClass({
+export default class SealedDeckBuilder extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      poolId: null,
+      boosters: ['KTK', 'KTK', 'KTK', 'KTK', 'KTK', 'KTK'],
+    }
+  }
+
+  componentWillMount() {
+    const params = qs.parse(window.location.search.substr(1))
+    if (params.pool) {
+      this.setState({
+        poolId: params.pool,
+      })
+    }
+    if (params.boosters) {
+      this.setState({
+        boosters: params.boosters.split(','),
+      })
+    }
+  }
+
   render() {
     return (
       <div className="container">
@@ -25,10 +48,8 @@ var SealedDeckBuilder = React.createClass({
             </div>
           </div>
         </nav>
-        <Pool set="KTK" />
+        <Pool id={this.state.poolId} boosters={this.state.boosters} />
       </div>
-    );
+    )
   }
-});
-
-export default SealedDeckBuilder;
+}
