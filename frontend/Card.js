@@ -8,10 +8,12 @@ export default class Card extends PureComponent {
   }
 
   render() {
-    const { imageUrl, name } = this.props.card
+    const { imageUrl, name, multiverseid } = this.props.card
+    const multiverseImage =
+      `http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=${multiverseid}&type=card`
     return (
       <div className="card">
-        <img src={imageUrl} alt={name} className="card__image" />
+        <img src={imageUrl || multiverseImage} alt={name} className="card__image" />
       </div>
     )
   }

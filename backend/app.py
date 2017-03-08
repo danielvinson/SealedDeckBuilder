@@ -1,7 +1,7 @@
 import os
 import psycopg2
 import json
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 from flask.json import jsonify
 from flask_sqlalchemy import SQLAlchemy
 
@@ -48,12 +48,16 @@ def add_pool():
     pool = Pool(json.dumps(cards))
     db.session.add(pool)
     db.session.commit()
-    return 'Pool Added %s' % (pool)
+    return jsonify(pool='%s' % pool.id)
 
 @app.route('/pool/<string:pool_id>', methods=['GET'])
 def get_pool(pool_id):
     pool = Pool.query.filter_by(id=pool_id).first()
     return jsonify(cards=pool.cards)
+
+@app.route('/sets/<string:set_id>', methods=['GET'])
+def get_set(set_id):
+    return send_from_directory('fixtures', filename=set_id + '.json')
 
 #####
 
